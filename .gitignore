@@ -1,1 +1,10 @@
+bin/
+include/
+lib/
+share/
+tmp/
+
+resources/*
+!resources/.gitkeep
+
 stdout.log
