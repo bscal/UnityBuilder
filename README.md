@@ -14,8 +14,8 @@ Built with Unity2019, lua5.1 and luadist on Cygwin.
 4. Edit config.lua to desired settings
 5. Run command `lua main.lua` or `bin/lua main.lua` if using Cygwin luadist install
 
-It will not on 15sec intervals check your projects directory for changes. If changes detected<br>
-then program will `build unity project -> move resource files -> zip files -> upload *TODO*`
+It will run on a 15sec interval checking your project directory for changes. If a change is detected<br>
+then the program will do the following: `build unity project -> move resource files -> zip files -> upload *TODO*`
 
 ## Dependencies
 These were built using luadist.
