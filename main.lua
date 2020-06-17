@@ -5,6 +5,7 @@ local ltn12 = require("ltn12")
 ZipWriter = require("ZipWriter")
 
 config = require("config")
+utils = require("utils")
 local build = require("build")
 local upload = require("upload")
 
@@ -17,12 +18,16 @@ end
 
 function updateLoop()
     while (true) do
-        print("updating...")
+        print("checking for changes...")
         local hash = build:hash(config.projectPath)
         if (hash ~= projectHash) then
             projectHash = hash
             for i = 1,#config.builds do
-                build:build(config.builds[i], config.buildPath .. config.builds[i])
+                local res = build:build(config.builds[i], config.buildPath .. config.builds[i])
+                if res == 1 then
+                    print("errored")
+                    return
+                end
             end
         end
         print("Sleeping for 15 seconds. This is ideal time to interrupt the script.")
