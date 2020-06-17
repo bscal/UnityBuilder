@@ -24,7 +24,7 @@ local function zipFiles(builder, ZipStream, localPath)
             local filePath
             if (localPath ~= nil) then filePath = localPath .. "\\" .. file else filePath = file end
             local newPath = curPath .. "\\" .. file
-            print(curPath, filePath)
+            if (config.verbose) then print("zipping", curPath, filePath) end
             local attr = lfs.attributes(newPath)
 
             if (attr.mode == "directory") then
@@ -43,7 +43,8 @@ end
 function upload:zip(builder) 
     local ZipStream = ZipWriter.new()
 
-    local filename = string.format("%s%s/%s.zip", config.buildPath, builder.name, builder.name)
+    local filename = string.format("%s%s-%s.zip", config.buildPath, config.projectName, builder.name)
+    print("Zipping to " .. filename)
     ZipStream:open_stream(assert(io.open(filename, 'w+b')), true)
     zipFiles(builder, ZipStream, nil)
     ZipStream:close()
