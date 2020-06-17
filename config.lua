@@ -24,13 +24,19 @@ local config = {
         "bin",
         "obj",
         "Logs",
-        "Library"
+        "Library",
+        "Temp",
     },
-
-    unityPath = "F:\\dev\\2019.3.14f1\\Editor\\Unity.exe", -- Path to unity.exe
-    projectPath = "F:\\dev\\Ballers", -- Path to unity project
-    buildPath = "F:\\dev\\Ballers\\builds\\", -- Path to place built files in
-    resourcePath = "\\resources" -- If you have files that need to be included that are not built
 }
+
+config.projectName = "Ballers"
+config.unityPath = "F:/dev/2019.3.14f1/Editor/Unity.exe" -- Path to unity.exe
+config.projectPath = "F:/dev/" .. config.projectName -- Path to unity project
+config.tempPath = "F:/dev/" .. config.projectName .. "-temp" -- Unity temp project for building
+config.buildPath = "F:/dev/" .. config.projectName .. "/builds/" -- Path to place built files in
+config.resourcePath = "/resources" -- If you have files that need to be included that are not built
+config.host = ""
+
+config.verbose = true
 
 return config
