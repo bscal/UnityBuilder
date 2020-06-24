@@ -1,0 +1,28 @@
+{
+  "name": "unitybuilder",
+  "version": "1.0.0",
+  "description": "small webserver for hosting UnityBuilder build files",
+  "main": "server.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "dependencies": {
+    "express-fileupload": "^1.1.7-alpha.3",
+    "express": "^4.17.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bscal/UnityBuilder.git"
+  },
+  "author": "bscal",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/bscal/UnityBuilder/issues"
+  },
+  "homepage": "https://github.com/bscal/UnityBuilder#readme"
+}
