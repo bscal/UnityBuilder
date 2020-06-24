@@ -37,26 +37,46 @@ local function zipFiles(builder, ZipStream, localPath)
     end
 end
 
-local function sendToServer()
+local function send(path)
+	print(path, config.host)
+	--[[
+	local f = io.open(path, "rb")
+	local attr = lfs.attributes(path)
+	local response = {}
+	local source = ltn12.source.string(f:read(attr.size))
+	local body,code,headers,status = http.request{
+        url = "localhost:3000/upload",
+        method = "POST",
+		headers = {
+			["Content-Type"] = "application/zip",
+            ["Content-Length"] = tostring(attr.size)
+		},
+		source = ltn12.source.file(f),
+		sink = ltn12.sink.table(response)
+    }
+	print(body,code,headers,status)
+	if headers then for k,v in pairs(headers) do print(k,v) end end
+	]]
+	local curl = string.format("curl -F data=@%s %s", path, config.host)
+	os.execute(curl)
+end
+
+function upload:sendToServer(builder, path)
+	send(path)
 end
 
 function upload:zip(builder) 
     local ZipStream = ZipWriter.new()
 
-    local filename = string.format("%s%s-%s.zip", config.buildPath, config.projectName, builder.name)
-    print("Zipping to " .. filename)
-    ZipStream:open_stream(assert(io.open(filename, 'w+b')), true)
+	-- Sets builder's zip data
+	builder.zipName = string.format("%s-%s.zip", config.projectName, builder.name)
+    builder.zipPath = string.format("%s%s", config.buildPath, builder.zipName)
+	
+    print("Zipping to " .. builder.zipPath)
+    ZipStream:open_stream(assert(io.open(builder.zipPath, 'w+b')), true)
     zipFiles(builder, ZipStream, nil)
     ZipStream:close()
-end
-
-function upload:send(path)
-    http.request{
-        url = config.host,
-        method = "POST",
-        source = ltn12.source.file(io.open(path, "rb")),
-        sink = ltn12.sink.file(io.stdout),
-    }
+    return zipPath
 end
 
 return upload

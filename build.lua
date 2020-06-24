@@ -3,9 +3,12 @@ local upload = require("upload")
 local build = {}
 
 build.name = ""
+build.zipName = ""
+build.zipPath = ""
 build.path = ""
 build.target = ""
 build.hashStr = "0"
+build.size = 0
 build.buildHashes = {}
 
 -- Handles the removal and creation of the temp project directory
@@ -72,28 +75,36 @@ function build:build(name, path)
     build.path = path
 
     print(string.format("Building Unity project: %s for platform: %s \n  ProjectPath:  %s \n  BuildPath:    %s\n  UnityInstall: %s", config.projectName, name, config.projectPath, config.buildPath, config.unityPath))
+--[[
+	if (config.skip.hash)
+		local hash = self:hash(path)
 
-    local hash = self:hash(path)
+		if (hash == self.hashStr) then
+		   return self.hashStr
+		end
+		self.hashStr = hash
 
-    if (hash == self.hashStr) then
-        return self.hashStr
-    end
-    self.hashStr = hash
-
-    handleTempDir(config.tempPath)
-    
+		handleTempDir(config.tempPath)
+	end
+    ]]
     print("Running build command...")
     local cmd = string.format("%s -quit -batchmode -nographics -logFile stdout.log -projectPath %s -executeMethod BuildScript.%s", config.unityPath, config.tempPath, name)
-    os.execute(cmd)
+    --os.execute(cmd)
 
     print(string.format("Creating temp project in %s", config.tempPath))
-    createTempProject(config.projectPath, config.tempPath)
+    --createTempProject(config.projectPath, config.tempPath)
 
     print("Moving resource files...")
-    moveResourcesFiles(lfs.currentdir() .. config.resourcePath)
+    --moveResourcesFiles(lfs.currentdir() .. config.resourcePath)
 
     print("Zipping files...")
-    upload:zip(self)
+    --self.zipPath = upload:zip(self)
+	
+	self.zipName = string.format("%s-%s.zip", config.projectName, self.name)
+    self.zipPath = string.format("%s%s", config.buildPath, self.zipName)
+	
+	print("Sending file to server")
+    upload:sendToServer(self, self.zipPath)
 end
 
 local function readBytes(path)

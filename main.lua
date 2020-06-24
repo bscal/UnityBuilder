@@ -1,7 +1,7 @@
-local lfs = require("lfs")
+lfs = require("lfs")
 md5 = require("md5")
-local http = require("socket.http")
-local ltn12 = require("ltn12")
+http = require("socket.http")
+ltn12 = require("ltn12")
 ZipWriter = require("ZipWriter")
 
 config = require("config")

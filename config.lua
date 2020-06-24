@@ -35,8 +35,17 @@ config.projectPath = "F:/dev/" .. config.projectName -- Path to unity project
 config.tempPath = "F:/dev/" .. config.projectName .. "-temp" -- Unity temp project for building
 config.buildPath = "F:/dev/" .. config.projectName .. "/builds/" -- Path to place built files in
 config.resourcePath = "/resources" -- If you have files that need to be included that are not built
-config.host = ""
+config.host = "127.0.0.1:3000/upload"
 
-config.verbose = true
+-- These are debug settings
+config.verbose = false
+
+config.skip = {
+	hash = false,
+	build = false,
+	zip = false,
+	upload = false
+}
+
 
 return config
