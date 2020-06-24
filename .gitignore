@@ -3,8 +3,14 @@ include/
 lib/
 share/
 tmp/
+uploads/
+root/
+
+node_modules/
 
 resources/*
 !resources/.gitkeep
 
 stdout.log
+
+test.txt
