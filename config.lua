@@ -30,6 +30,7 @@ local config = {
 }
 
 config.projectName = "Ballers"
+config.projectVersion = "0.0.1"
 config.unityPath = "F:/dev/2019.3.14f1/Editor/Unity.exe" -- Path to unity.exe
 config.projectPath = "F:/dev/" .. config.projectName -- Path to unity project
 config.tempPath = "F:/dev/" .. config.projectName .. "-temp" -- Unity temp project for building
@@ -40,10 +41,12 @@ config.host = "127.0.0.1:3000/upload"
 -- These are debug settings
 config.verbose = false
 
+-- Skips part of the build. true = will skip
 config.skip = {
-	hash = false,
-	build = false,
-	zip = false,
+	hash = true,
+	build = true,
+	meta = true,
+	zip = true,
 	upload = false
 }
 
