@@ -5,11 +5,19 @@ local build = {}
 build.name = ""
 build.zipName = ""
 build.zipPath = ""
-build.path = ""
-build.target = ""
+build.buildPath = ""
 build.hashStr = "0"
-build.size = 0
 build.buildHashes = {}
+build.meta = {}
+
+local function createMetaFile()
+    local f = assert(io.open(build.buildPath .. "/build.meta", "w"))
+
+    for k,v in pairs(build.meta) do
+        f:write(k .. "=" .. v)
+    end
+    f:close()
+end
 
 -- Handles the removal and creation of the temp project directory
 local function handleTempDir(path)
@@ -72,11 +80,12 @@ end
 
 function build:build(name, path)
     build.name = name
-    build.path = path
+    build.buildPath = path
 
     print(string.format("Building Unity project: %s for platform: %s \n  ProjectPath:  %s \n  BuildPath:    %s\n  UnityInstall: %s", config.projectName, name, config.projectPath, config.buildPath, config.unityPath))
---[[
-	if (config.skip.hash)
+
+	-- Sets hashes for the build
+	if (not config.skip.hash) then
 		local hash = self:hash(path)
 
 		if (hash == self.hashStr) then
@@ -86,25 +95,50 @@ function build:build(name, path)
 
 		handleTempDir(config.tempPath)
 	end
-    ]]
-    print("Running build command...")
-    local cmd = string.format("%s -quit -batchmode -nographics -logFile stdout.log -projectPath %s -executeMethod BuildScript.%s", config.unityPath, config.tempPath, name)
-    --os.execute(cmd)
 
-    print(string.format("Creating temp project in %s", config.tempPath))
-    --createTempProject(config.projectPath, config.tempPath)
+	if (not config.skip.build) then
+		-- Creates a temp project to build because only 1 Unity project can be open at a time
+		print(string.format("Creating temp project in %s", config.tempPath))
+		createTempProject(config.projectPath, config.tempPath)
+		
+		-- Preforms a Unity build command
+		print("Running build command...")
+		local cmd = string.format("%s -quit -batchmode -nographics -logFile stdout.log -projectPath %s -executeMethod BuildScript.%s", config.unityPath, config.tempPath, name)
+		os.execute(cmd)
 
-    print("Moving resource files...")
-    --moveResourcesFiles(lfs.currentdir() .. config.resourcePath)
+		-- Moves over any resources files
+		print("Moving resource files...")
+		moveResourcesFiles(lfs.currentdir() .. config.resourcePath)
+	end
 
-    print("Zipping files...")
-    --self.zipPath = upload:zip(self)
-	
+	if (not config.skip.meta) then
+		-- TODO possible add a meta data file to the build.
+		build.meta.build = name
+		build.meta.project = config.projectName
+		build.meta.version = config.projectVersion
+		build.meta.platform = config.buildSettings[self.name].target
+		build.meta.hash = self.hashStr
+		build.meta.date = socket.gettime() * 1000
+		createMetaFile()
+	end
+
+	-- Sets zip varswd
 	self.zipName = string.format("%s-%s.zip", config.projectName, self.name)
     self.zipPath = string.format("%s%s", config.buildPath, self.zipName)
+
+	-- Zips the built project
+	if (not config.skip.zip) then
+		print("Zipping files...")
+		upload:zip(self)
+	end
 	
-	print("Sending file to server")
-    upload:sendToServer(self, self.zipPath)
+	-- Uploads the project with cURL to the host
+	if (not config.skip.upload) then
+		print("Sending file to server")
+		upload:sendToServer(self, self.zipPath)
+	end
+	
+	print("Done build")
 end
 
 local function readBytes(path)
@@ -116,6 +150,7 @@ local function readBytes(path)
     end
 end
 
+-- returns a 16 char md5 hash of the specified path. is recurrsive 
 function build:hash(path)
     local str = ""
     for file in lfs.dir(path) do
