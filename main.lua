@@ -1,5 +1,6 @@
 lfs = require("lfs")
 md5 = require("md5")
+socket = require("socket")
 http = require("socket.http")
 ltn12 = require("ltn12")
 ZipWriter = require("ZipWriter")
@@ -30,6 +31,7 @@ function updateLoop()
                 end
             end
         end
+		sleep(1)
         print("Sleeping for 15 seconds. This is ideal time to interrupt the script.")
         sleep(15)
     end
