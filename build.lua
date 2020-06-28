@@ -2,6 +2,7 @@ local upload = require("upload")
 
 local build = {}
 
+-- Data for the build.
 build.name = ""
 build.zipName = ""
 build.zipPath = ""
@@ -10,6 +11,7 @@ build.hashStr = "0"
 build.buildHashes = {}
 build.meta = {}
 
+--- Creates a .meta file containing the fields from build.meta. Placed in root of target build dir.
 local function createMetaFile()
     local f = assert(io.open(build.buildPath .. "/build.meta", "w"))
 
@@ -35,6 +37,10 @@ local function handleTempDir(path)
     lfs.mkdir(path)
 end
 
+--- Unity only supports a single project being open 1 time. So creating a
+--- temp project will allow for an easier build process.
+---
+--- Usually should use config.tempPath value for toPath.
 local function createTempProject(fromPath, toPath)
     for file in lfs.dir(fromPath) do
         if (not utils:isIgnoredFile(file)) then
@@ -58,6 +64,7 @@ local function createTempProject(fromPath, toPath)
     end
 end
 
+--- Copies any files from root/resources to target dir's root
 local function moveResourcesFiles(path)
     for file in lfs.dir(path) do
         if (file ~= nil and file ~= "." and file ~= "..") then
@@ -78,6 +85,12 @@ local function moveResourcesFiles(path)
     end
 end
 
+--- Function to do a FULL build on the project
+--- Can skip by configuring config.slip values
+---
+--- parameters:
+--- name - name of the build
+--- path - the target path to build to
 function build:build(name, path)
     build.name = name
     build.buildPath = path
@@ -150,7 +163,7 @@ local function readBytes(path)
     end
 end
 
--- returns a 16 char md5 hash of the specified path. is recurrsive 
+--- returns a 16 char md5 hash of the specified path. is recurrsive
 function build:hash(path)
     local str = ""
     for file in lfs.dir(path) do

@@ -1,5 +1,6 @@
 local upload = {}
 
+--- Used in the zip files write process. Returns a ZipWriter file desc and a sink for that files data.
 local function makeReader(file, attr)
     local f = assert(io.open(file, "rb"))
     local desc = {
@@ -37,6 +38,7 @@ local function zipFiles(builder, ZipStream, localPath)
     end
 end
 
+--- Uploads build data and zip file to config.host using http request, curl and forms.
 function upload:sendToServer(builder, path)
 	print(path, config.host)
 	-- cURL command to send a form of zip file to the host.
@@ -54,7 +56,12 @@ function upload:sendToServer(builder, path)
 	--local curl = "curl -F data=@%s %s"
 end
 
-function upload:zip(builder) 
+--- Zips contents of a directory into a zip.
+---
+--- Requires a builder or build:build reference
+---
+--- Zip path is taken from builder.zipPath
+function upload:zip(builder)
     local ZipStream = ZipWriter.new()
     print("Zipping to " .. builder.zipPath)
     ZipStream:open_stream(assert(io.open(builder.zipPath, 'w+b')), true)
